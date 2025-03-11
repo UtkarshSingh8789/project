@@ -17,7 +17,9 @@ const generateAccessTokenAndRefreshToken=async(userId)=>{
     }
 }
 const registerUser=asyncHandler(async (req,res)=>{
+    console.log("Received Data:", req.body);
     const {fullName,email,phoneNumber,password,role}=req.body
+
     if(fullName===""){
         throw new ApiError(400,"fullName is required");
     }
@@ -42,9 +44,10 @@ const registerUser=asyncHandler(async (req,res)=>{
         ]
     });
     if(existedUser){
+        console.log("user already present") // ye debugging step hai;
         throw new ApiError(409,"user with the same phone number and email is already registered");
     }
-    const user=User.create({
+    const user=await User.create({
         fullName,
         email,
         phoneNumber,
@@ -53,6 +56,7 @@ const registerUser=asyncHandler(async (req,res)=>{
     })// mereko user milgya jo jaake mongodb me create hoga;
     //humlog ko ye bhi check krna hoga kya user create krne me server end se koi dikkat bua hai kya?
     // dekho jb user mongodb pe create hoga toh humlog ko ek unique id dega jo mogodb provide krta hai check krlenge isi id ke dwaraa ki user create hua ya nhi;
+    console.log("New User Created:", user);// bhai ye debugging step hai
     const createdUser=await User.findById(user._id).select(
         // is select ke and we we field likhenge jo use krne hai
         // but yha ulta use krenge jo field htane hai we hum - krke use krenge in string weird syntax;
@@ -61,25 +65,28 @@ const registerUser=asyncHandler(async (req,res)=>{
     if(!createdUser){
         throw new ApiError(500,"Something went wrong while regestring user")
     }
+    console.log("Final response to be sent:", createdUser);// debugging step;
     return res.status(201).json(
         new ApiResponse(200,createdUser,"user created successfully")
     )
 })
 // login User;
-const loginUser=asyncHandler(async(req,re)=>{
-    const {email,phoneNumber,password}=req.body
-    if(!(email || phoneNumber)){
-        throw new ApiError(400,"email or phone number is required")
+const loginUser=asyncHandler(async(req,res)=>{
+    const {email,password,role}=req.body
+    if(!(email || password || role)){
+        throw new ApiError(400,"email password and role is required")
     }
-    const user=await User.findOne({
-        $or:[{email},{phoneNumber}]
-    })
+    const user=await User.findOne({email})
     if(!user){
         throw new ApiError(404,"user donot exist")
     }
     const isPasswordValid=await user.isPasswordCorrect(password)
     if(!isPasswordValid){
         throw new ApiError(404,"Password is incorrect")
+    }
+    if(role!=user.role){
+        // yha thora syntax error ho skta hai yaad rkhna.
+        throw new ApiError(404,"User with this role donot exist")
     }
     const {accessToken,refreshToken}=await generateAccessTokenAndRefreshToken(user._id)
     const loggedInUser=await User.findById(user._id).select("-password -refreshToken")
