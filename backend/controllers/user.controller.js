@@ -192,6 +192,42 @@ const getCurrentUser=asyncHandler(async(req,res)=>{
     .status(200)
     .json(200,req.user,"curent user fectched successfully")
 })
+const updateAccountdetails=asyncHandler(async(req,res)=>{
+    // ishme thora changes krenge baad me;
+    const {fullName,email,phoneNumber,bio,skills}=req.body
+    if(fullName===""){
+        throw new ApiError(400,"fullName is required");
+    }
+    if(email===""){
+        throw new ApiError(400,"email is required")
+    }
+    if(phoneNumber===""){
+        throw new ApiError(400,"phoneNumber is required")
+    }
+    if(bio===""){
+        throw new ApiError(400,"bio is required")
+    }
+    if(skills===""){
+        throw new ApiError(400,"skills is required")
+    }
+    const skillsArray=skills.split(",");
+    const user=User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set:{
+                fullName:fullName,
+                email:email,
+                phoneNumber:phoneNumber,
+                "profile.bio":bio,
+                "profile.skills":skillsArray
+            }
+        },
+        {new:true}// update hone ke baad wala data aapko return hoga
+    ).select("-password")
+    return res
+    .status(200)
+    .json(new ApiResponse(200,user,"Account updated successfully"))
+})
 export {
     registerUser,
     loginUser,
@@ -199,4 +235,5 @@ export {
     refreshAccessToken,
     changeCurrentPassword,
     getCurrentUser,
+    updateAccountdetails,
 }
