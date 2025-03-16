@@ -15,13 +15,13 @@ const registerCompany=asyncHandler(async(req,res)=>{
         name:companyName,
         userId:req.user?._id
     })
-    const createdCompany=Company.findById(company._id)
+    const createdCompany=await Company.findById(company._id)
     if(!createdCompany){
         throw new ApiError(500,"something went wrong while regestring company")
     }
     return res.
     status(201).
-    json(new ApiResponse(200,createdCompany,"Company registerd Succesfully"))
+    json(new ApiResponse(200,{createdCompany},"Company registerd Succesfully"))
 })
 // ab humlog get company ka controller likhenge yaad rkhna humlog company get user ke id se krenge
 // kyuki login user jo company create kiya hoga we hi ishko denge nah ki sara ka sara globe ka company;
@@ -33,7 +33,7 @@ const getCompany=asyncHandler(async(req,res)=>{
     }
     return res.
     status(200).
-    json(new ApiResponse(200,companies,"your registerd company"))
+    json(new ApiResponse(200,{companies},"your registerd company"))
 })
 const getCompanyById=asyncHandler(async(req,res)=>{
     const companyId=req.params.id
@@ -43,10 +43,22 @@ const getCompanyById=asyncHandler(async(req,res)=>{
     }
     return res.
     status(200).
-    json(new ApiResponse(200,company,"found"))
+    json(new ApiResponse(200,{company},"found"))
+})
+const updateCompany=asyncHandler(async(req,res)=>{
+    const {name,description,website,location}=req.body;
+    const updateData={name,description,website,location}
+    const company=await Company.findByIdAndUpdate(req.params.id,updateData,{new: true})
+    if(!company){
+        throw new ApiError(404,"Something went wrong while updating the information of company")
+    }
+    return res.
+    status(200).
+    json(new ApiResponse(200,{company},"company information updated successfully"))
 })
 export {
     registerCompany,
     getCompany,
-    getCompanyById
+    getCompanyById,
+    updateCompany,
 }
