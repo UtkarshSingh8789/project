@@ -67,7 +67,7 @@ const registerUser=asyncHandler(async (req,res)=>{
     }
     console.log("Final response to be sent:", createdUser);// debugging step;
     return res.status(201).json(
-        new ApiResponse(200,createdUser,"user created successfully")
+        new ApiResponse(200,{createdUser},"user created successfully")
     )
 })
 // login User;
