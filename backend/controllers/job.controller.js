@@ -78,6 +78,8 @@ const getAdminJobs=asyncHandler(async(req,res)=>{
 export{
     createdJob,
     getAllJobs,
+    getJobById,
+    getAdminJobs
 }
 
 

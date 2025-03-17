@@ -19,6 +19,8 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 import router from "./routes/user.routes.js";
 import companyrouter from "./routes/company.routes.js";
+import jobrouter from "./routes/job.routes.js";
 app.use("/api/v1/users",router)
 app.use("/api/v1/company",companyrouter)
+app.use("/api/v1/job",jobrouter)
 export {app};
