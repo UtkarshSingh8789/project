@@ -66,9 +66,9 @@ const getApplicant=asyncHandler(async(req,res)=>{
     status(202).
     json(new ApiResponse(202,{job},"successfull"))
 })
-const updateStatus=asyncHandler(async(req,res)=>{
+// const updateStatus=asyncHandler(async(req,res)=>{
     
-})
+// })
 export {applyJob,
     getAppliedJob,
     getApplicant,
