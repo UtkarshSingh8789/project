@@ -67,7 +67,20 @@ const getApplicant=asyncHandler(async(req,res)=>{
     json(new ApiResponse(202,{job},"successfull"))
 })
 const updateStatus=asyncHandler(async(req,res)=>{
-    
+    const {status} =req.body;
+    const applicationId=req.params.id;
+    if(!status){
+        throw new ApiError(404,"status is required");
+    }
+    const application=await Application.findOne({id:applicationId})
+    if(!application){
+        throw new ApiError(404,"application not found");
+    }
+    application.status=status.toLowerCase()
+    await application.save()
+    return res.
+    status(200).
+    json(new ApiResponse(202,{application},"applicatioon status Successfully"))
 })
 export {applyJob,
     getAppliedJob,
